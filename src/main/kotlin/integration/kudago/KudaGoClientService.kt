@@ -6,8 +6,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-class KudaGoServiceClient(
+class KudaGoClientService(
     private val client: HttpClient = HttpClient {
         install(ContentNegotiation) {
             json()
@@ -15,7 +17,8 @@ class KudaGoServiceClient(
     },
     private val json: Json = Json { ignoreUnknownKeys = true },
     private val apiVersion: String = "v1.4",
-    private val url: String = "https://kudago.com/public-api/$apiVersion/news/"
+    private val url: String = "https://kudago.com/public-api/$apiVersion/news/",
+    private val logger: Logger = LoggerFactory.getLogger(KudaGoClientService::class.java.name)
 ) {
     companion object {
         private const val DEFAULT_LOCATION = "smr"
@@ -39,10 +42,11 @@ class KudaGoServiceClient(
                 parameter("order_by", "-publication_date")
             }
             val news: NewsResponse = json.decodeFromString(response.bodyAsText())
-            println("Fetched ${news.results.size} news")
+            logger.debug("Fetched List of news: {}", news)
+            logger.info("Successfully fetched ${news.results.size} news from KudaGo")
             news.results
         } catch (e: Exception) {
-            println("Error fetching news: ${e.message}")
+            logger.error("Error fetching news: ${e.message}")
             emptyList()
         }
     }

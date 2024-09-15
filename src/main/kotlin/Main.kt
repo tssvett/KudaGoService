@@ -1,5 +1,5 @@
 suspend fun main() {
-    val client = KudaGoServiceClient()
+    val client = KudaGoClientService()
     val news = client.getNews()
     news.forEach() { println(it) }
 }
