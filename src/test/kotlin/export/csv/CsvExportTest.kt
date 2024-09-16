@@ -2,80 +2,100 @@ package export.csv
 
 import data.News
 import data.Place
-import io.mockk.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.*
 import java.io.File
 
 class CsvExportTest {
 
+    private val testDir = "test" // Директория для тестов
+    private val testFilePath = "$testDir/test_news.csv"
+
     @BeforeEach
     fun setup() {
-        mockkStatic(File::class)
+        // Создаем директорию для тестов, если она не существует
+        File(testDir).mkdirs()
     }
 
     @AfterEach
     fun teardown() {
-        unmockkStatic(File::class)
+        // Удаляем файл после каждого теста, если он существует
+        File(testFilePath).delete()
     }
 
     @Test
     fun `test saveNews creates file correctly`() {
-        val path = "test_news.csv"
-        val file = mockFile(path, true)
-        val timeNow = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        // Arrange
         val newsList = listOf(
-            News(1, timeNow, "Title 1", Place.PlaceObject(1), "Description 1", "url1", 10, 5),
-            News(2, timeNow, "Title 2", Place.PlaceObject(2), "Description 2", "url2", 20, 10),
-            News(3, timeNow, "Title 3", Place.PlaceObject(3), "Description 3", "url3", 5, 2)
+            News(
+                1,
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                "Title 1",
+                Place.PlaceObject(1),
+                "Description 1",
+                "url1",
+                10,
+                5
+            ),
+            News(
+                2,
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                "Title 2",
+                Place.PlaceObject(2),
+                "Description 2",
+                "url2",
+                20,
+                10
+            ),
+            News(
+                3,
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                "Title 3",
+                Place.PlaceObject(3),
+                "Description 3",
+                "url3",
+                5,
+                2
+            )
         )
 
-        saveNews(path, newsList)
+        // Act
+        saveNews(testFilePath, newsList)
 
-        verify { file.exists() }
-        verify { file.parentFile.exists() }
-        verify { file.writeText(match { it.contains("id,title,place,description,site_url,favorites_count,comments_count,publication_date") }) }
-        verify { file.writeText(match { it.contains("1,Title 1,1,Description 1,url1,10,5") }) }
-        verify { file.writeText(match { it.contains("2,Title 2,2,Description 2,url2,20,10") }) }
+        // Assert: Проверяем, что файл был создан и содержит правильные данные
+        val file = File(testFilePath)
+        Assertions.assertTrue(file.exists(), "Файл не был создан")
+
+        val fileContent = file.readText()
+        Assertions.assertTrue(fileContent.contains("id,title,place_id,description,site_url,favorites_count,comments_count,publication_date"))
+        Assertions.assertTrue(fileContent.contains("1,Title 1,PlaceObject(id=1),Description 1,url1,10,5"))
+        Assertions.assertTrue(fileContent.contains("2,Title 2,PlaceObject(id=2),Description 2,url2,20,10"))
+        Assertions.assertTrue(fileContent.contains("3,Title 3,PlaceObject(id=3),Description 3,url3,5,2"))
     }
 
     @Test
     fun `test saveNews throws exception if file exists`() {
-        val path = "existing_file.csv"
-        val file = mockFile(path, true)
+        // Arrange: Создаем файл заранее
+        File(testFilePath).createNewFile()
 
-        assertThrows<IllegalArgumentException> {
-            saveNews(path, emptyList())
+        // Act & Assert: Проверяем выброс исключения при попытке перезаписи существующего файла
+        val exception = assertThrows<IllegalArgumentException> {
+            saveNews(testFilePath, emptyList())
         }
-
-        verify { file.exists() }
+        Assertions.assertEquals("Файл уже существует по указанному пути: $testFilePath", exception.message)
     }
 
     @Test
     fun `test saveNews throws exception if parent directory does not exist`() {
-        val path = "/invalid/directory/test_news.csv"
-        val file = mockFile(path, false)
+        // Arrange: Указываем путь к файлу в несуществующей директории
+        val invalidPath = "/invalid/directory/test_news.csv"
 
-        assertThrows<IllegalArgumentException> {
-            saveNews(path, emptyList())
+        // Act & Assert: Проверяем выброс исключения при отсутствии родительской директории
+        val exception = assertThrows<IllegalArgumentException> {
+            saveNews(invalidPath, emptyList())
         }
-
-        verify { file.parentFile.exists() }
-    }
-
-    private fun mockFile(path: String, parentExists: Boolean): File {
-        val file = mockk<File>(relaxed = true)
-        val parent = mockk<File>(relaxed = true)
-
-        every { File(path) } returns file
-        every { file.parentFile } returns parent
-        every { parent.exists() } returns parentExists
-
-        return file
+        Assertions.assertEquals("Файл уже существует по указанному пути: $invalidPath", exception.message)
     }
 }

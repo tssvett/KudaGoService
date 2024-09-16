@@ -15,6 +15,9 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("io.ktor:ktor-client-mock:2.0.0") // Для мокирования Ktor клиента
+    testImplementation("io.ktor:ktor-client-content-negotiation:2.0.0") // Для работы с сериализацией
+    testImplementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0") // Для работы с JSON
     dependencies {
         implementation("io.ktor:ktor-client-core:$ktor_version")
         implementation("io.ktor:ktor-client-cio:$ktor_version")
