@@ -1,7 +1,8 @@
 package serialization
 
 import data.Place
-import kotlinx.serialization.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -19,10 +20,12 @@ object PlaceSerializer : KSerializer<Place> {
             jsonElement is JsonPrimitive && jsonElement.isString -> {
                 Place.PlaceString(jsonElement.content)
             }
+
             jsonElement is JsonObject -> {
                 val id = jsonElement["id"]?.jsonPrimitive?.int ?: throw SerializationException("Invalid Place object")
                 Place.PlaceObject(id)
             }
+
             else -> throw SerializationException("Invalid Place format")
         }
     }

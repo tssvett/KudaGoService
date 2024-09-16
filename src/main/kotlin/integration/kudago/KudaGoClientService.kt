@@ -1,3 +1,5 @@
+package integration.kudago
+
 import data.News
 import data.NewsResponse
 import io.ktor.client.*
