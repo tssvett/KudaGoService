@@ -2,12 +2,9 @@ package extensions
 
 import data.News
 import data.Place
-import getMostRatedNewsWithLoops
-import getMostRatedNewsWithSequences
 import kotlinx.datetime.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.days
 
 class NewsExtensionsTest {
     @Test
@@ -20,7 +17,7 @@ class NewsExtensionsTest {
         )
 
         // Установим период времени от 7 дней назад до сейчас
-        val period = (timeNow.toJavaLocalDateTime().minusDays(7).toKotlinLocalDateTime() ..timeNow)
+        val period = (timeNow.toJavaLocalDateTime().minusDays(7).toKotlinLocalDateTime()..timeNow)
         val result = news.getMostRatedNewsWithLoops(2, period)
 
         assertEquals(2, result.size)
@@ -38,7 +35,7 @@ class NewsExtensionsTest {
         )
 
         // Установим период времени от 7 дней назад до сейчас
-        val period = (timeNow.toJavaLocalDateTime().minusDays(7).toKotlinLocalDateTime() ..timeNow)
+        val period = (timeNow.toJavaLocalDateTime().minusDays(7).toKotlinLocalDateTime()..timeNow)
         val result = news.getMostRatedNewsWithSequences(2, period)
 
         assertEquals(2, result.size)
