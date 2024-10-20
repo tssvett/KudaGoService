@@ -35,36 +35,28 @@ class KudaGoClientService(
 
     suspend fun getNewsPage(
         location: String = DEFAULT_LOCATION,
-        count: Int = DEFAULT_COUNT,
-        page: Int = DEFAULT_PAGE
+        elementsInPageNumber: Int = DEFAULT_COUNT,
+        pageNumber: Int = DEFAULT_PAGE
     ): List<News> {
         return semaphore.withPermit {
-            fetchNews(location, count, page)
-        }
-    }
+            try {
+                val response: HttpResponse = client.get(baseUrl) {
+                    parameter("location", location)
+                    parameter("text_format", "text")
+                    parameter("fields", FIELDS)
+                    parameter("page_size", elementsInPageNumber)
+                    parameter("page", pageNumber)
+                    parameter("order_by", "-publication_date")
+                }
 
-    private suspend fun fetchNews(location: String, count: Int, page: Int): List<News> {
-        return try {
-            val response: HttpResponse = client.get(baseUrl) {
-                parameter("location", location)
-                parameter("text_format", "text")
-                parameter("fields", FIELDS)
-                parameter("page_size", count)
-                parameter("page", page)
-                parameter("order_by", "-publication_date")
+                val news: NewsResponse = json.decodeFromString(response.bodyAsText())
+                logger.debug("Fetched List of news: {}", news)
+                logger.info("Successfully fetched ${news.results.size} news from KudaGo")
+                return news.results
+            } catch (e: Exception) {
+                logger.error("Error fetching news: ${e.message}")
+                emptyList()
             }
-
-            processResponse(response)
-        } catch (e: Exception) {
-            logger.error("Error fetching news: ${e.message}")
-            emptyList()
         }
-    }
-
-    private suspend fun processResponse(response: HttpResponse): List<News> {
-        val news: NewsResponse = json.decodeFromString(response.bodyAsText())
-        logger.debug("Fetched List of news: {}", news)
-        logger.info("Successfully fetched ${news.results.size} news from KudaGo")
-        return news.results
     }
 }

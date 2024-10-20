@@ -40,7 +40,7 @@ class KudaGoCoroutineFlow(
 
         for (page in workerId..totalPages step workerCount) {
             logger.info("Worker $workerId: Fetching page $page")
-            kudaGoClientService.getNewsPage(count = pageSize, page = page).forEach { channel.send(it) }
+            kudaGoClientService.getNewsPage(elementsInPageNumber = pageSize, pageNumber = page).forEach { channel.send(it) }
         }
     }
 

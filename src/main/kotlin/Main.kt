@@ -7,6 +7,7 @@ import integration.kudago.KudaGoClientService
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.time.Duration
 
 suspend fun main() {
     task6()
@@ -46,11 +47,17 @@ fun task5() {
 }
 
 suspend fun task6() {
+    val workerCount = 10
+    val timeBefore = Clock.System.now()
     KudaGoCoroutineFlow(
         kudaGoClientService = KudaGoClientService(),
         newsPrinter = NewsPrinter(),
         totalNewsCount = 100,
-        workerCount = 2,
+        workerCount = workerCount,
         pageSize = 10
     ).start()
+
+    val timeAfter = Clock.System.now()
+    val durationInMillis = (timeAfter - timeBefore).inWholeMilliseconds
+    println("Duration: $durationInMillis ms with $workerCount workers")
 }
