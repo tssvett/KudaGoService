@@ -5,13 +5,14 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class NewsPrinter(
+    private var stringBuilder: StringBuilder = StringBuilder(),
     private var indentSpaces: Int = 4,
     private var logger: Logger = LoggerFactory.getLogger(NewsPrinter::class.java)
 ) {
 
     // Метод для вывода одной новости
-    fun news(newsItem: News) {
-        printNews(newsItem)
+    fun news(newsItem: News): String {
+        return printNews(newsItem)
     }
 
     // Метод для вывода списка новостей
@@ -19,12 +20,10 @@ class NewsPrinter(
         newsItems.forEach { printNews(it) }
     }
 
-    private fun printNews(newsItem: News) {
+    private fun printNews(newsItem: News): String {
         logger.debug("Starting output with dsl news item: {}", newsItem)
         val indent = " ".repeat(indentSpaces)
-
-        println(
-            """
+        val currentString = """
             |${indent}News ID: ${newsItem.id}
             |${indent}Title: ${newsItem.title}
             |${indent}Description: ${newsItem.description}
@@ -34,14 +33,13 @@ class NewsPrinter(
             |${indent}Favorites Count: ${newsItem.favoritesCount}
             |${indent}Comments Count: ${newsItem.commentsCount}
             |${indent}Rating: ${"%.2f".format(newsItem.rating)}
-        """.trimMargin()
-        )
-
-        println("${indent}-----------------------------")
+        """.trimMargin() + "\n${indent}-----------------------------"
+        //println(currentString)
+        return currentString
     }
 }
 
 fun newsOutputDsl(indentSpaces: Int = 4, block: NewsPrinter.() -> Unit) {
-    val printer = NewsPrinter(indentSpaces)
+    val printer = NewsPrinter(indentSpaces = indentSpaces)
     printer.block()
 }
