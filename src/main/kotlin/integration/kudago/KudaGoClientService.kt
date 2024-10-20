@@ -32,7 +32,6 @@ class KudaGoClientService(
         private const val DEFAULT_PAGE = 1
         private const val FIELDS = "id,title,place,description,site_url,favorites_count,comments_count,publication_date"
     }
-
     suspend fun getNewsPage(
         location: String = DEFAULT_LOCATION,
         elementsInPageNumber: Int = DEFAULT_COUNT,

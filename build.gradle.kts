@@ -8,13 +8,13 @@ group = "dev.tssvett"
 version = "1.0-SNAPSHOT"
 val ktor_version = "3.0.0"
 
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
     testImplementation(kotlin("test"))
-
 
     testImplementation("io.ktor:ktor-client-mock:2.0.0") // Для мокирования Ktor клиента
 
@@ -25,7 +25,6 @@ dependencies {
     testImplementation("io.ktor:ktor-client-content-negotiation:3.0.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-
     dependencies {
         implementation("io.ktor:ktor-client-core:$ktor_version")
         implementation("io.ktor:ktor-client-cio:$ktor_version")
@@ -35,8 +34,6 @@ dependencies {
         implementation("org.slf4j:slf4j-api:1.7.32")
         // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
         testImplementation("ch.qos.logback:logback-classic:1.5.11")
-
-        implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
     }
 }
 
